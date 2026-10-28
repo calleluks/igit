@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+require "reline"
+
+loop do
+  line = Reline.readline("igit> ", true)
+
+  if line.nil?
+    puts
+    exit
+  end
+
+  case line.chomp
+  when "exit", "quit"
+    exit
+  when ""
+    system "git status"
+  else
+    system "git #{line}"
+  end
+rescue Interrupt
+end
