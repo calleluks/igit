@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require "reline"
+require "shellwords"
 
 loop do
   line = Reline.readline("igit> ", true)
@@ -16,7 +17,7 @@ loop do
   when ""
     system "git status"
   else
-    system "git #{line}"
+    system "git", *Shellwords.split(line)
   end
 rescue Interrupt
 end
