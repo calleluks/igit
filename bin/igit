@@ -3,6 +3,23 @@
 require "reline"
 require "shellwords"
 
+completion_script = <<~'SCRIPT'
+  source /usr/share/bash-completion/completions/git 2>/dev/null || exit 0
+
+  read -r -a COMP_WORDS <<< "$IGIT_LINE"
+  [[ $IGIT_LINE == *" " ]] && COMP_WORDS+=("")
+  COMP_CWORD=$((${#COMP_WORDS[@]} - 1))
+
+  __git_func_wrap __git_main
+  printf '%s\n' "${COMPREPLY[@]}"
+SCRIPT
+
+Reline.completion_proc = ->(target, preposing) do
+  line = "git #{preposing}#{target}"
+  IO.popen({ "IGIT_LINE" => line }, ["bash", "-c", completion_script], &:read)
+    .lines.map(&:chomp)
+end
+
 loop do
   line = Reline.readline("igit> ", true)
 
